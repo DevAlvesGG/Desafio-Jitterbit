@@ -2,50 +2,62 @@ const order = require('../model/order')
 
 module.exports = {
 
-    //GET /order/list - retorna todas as orders
-    allOrder: (req, res) => {
-        const orders = order.getAllOrders();
-        return res.status(200).json(orders);
-    },
-
-    //GET /order/:id - retorna uma order baseada no id
-    showOrder: (req, res) => {
-        const { id } = req.params;
-        const orderFound = order.getOrderById(id);
-        if(!orderFound) {
-            return res.status(404).json({ message: 'Order Not Found'})
+    //GET /order/list - return all orders
+    allOrder: async (req, res) => {
+        try {
+            const orders = await order.getAllOrders();
+            return res.status(200).json(orders);
+        } catch (error) {
+           return res.status(500).json({ message: error.message }) 
         }
-        return res.status(200).json(orderFound);
-    },
-    //POST /order - cria um novo pedido
-    createOrder: (req, res) => {
-        const { value, itens } = req.body;
-        const newOrder = order.createOrder(value, itens);
-        return res.status(201).json(newOrder);
     },
 
-    //GET /order/list - lista todos os pedidos
-
-
-    //PUT /order/:id - atualiza um pedido baseado no id
-    update: (req, res) => {
-        const { id } = req.params;
-        const { value, itens } = req.body;
-        const orderFound = order.getOrderById(id);
-        if(!orderFound) {
-            return res.status(404).json({ message: 'Order Not Found'})
+    //GET /order/:id - returns a specific order.
+    showOrder: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const numericId = parseInt(id);
+            const orderFound = await order.getOrderById(numericId);
+            return res.status(200).json(orderFound);
+        } catch (error) {
+            return res.status(404).json({ message: 'Order Not Founddd'})
         }
-        orderFound.value = value ?? orderFound.value;
-        orderFound.itens = itens ?? orderFound.itens;
-
-        order.updateOrder(orderFound);
-        return res.status(200).json(orderFound);
     },
 
-    //DELETE /order/:id - deleta um pedido baseado no id
-    delete: (req, res) => {
-        const { id } = req.params;
-        const userDeleted = order.deleteOrder(id);
-        return res.status(200).json(userDeleted);
+    //POST /order - create a new order
+    createOrder: async (req, res) => {
+        try {
+            const { value, itens } = req.body;
+            const newOrder = await order.createOrder(value, itens);
+            return res.status(201).json(newOrder);
+        } catch (error) {
+            return res.status(500).json({ message: error.message })
+        }
+    },
+
+    //PUT /order/:id - update order 
+    update: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { value, itens } = req.body;
+            const orderFound = await order.getOrderById(id);
+            orderFound.value = value ?? orderFound.value;
+            orderFound.itens = itens ?? orderFound.itens;
+            order.updateOrder(orderFound);
+            return res.status(200).json(orderFound);
+        } catch (error) {
+            return res.status(404).json({ message: 'Order Not Found'})
+        } 
+    },
+
+    //DELETE /order/:id - delete order 
+    delete: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const userDeleted = await order.deleteOrder(id);
+            return res.status(200).json(userDeleted);
+        } catch (error) {
+            return res.status(500).json({ message: error.message })
+        }
     }
 }
