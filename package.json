@@ -21,6 +21,7 @@
   "homepage": "https://github.com/DevAlvesGG/Desafio-Jitterbit#readme",
   "dependencies": {
     "express": "^5.2.1",
+    "pg": "^8.20.0",
     "uuid": "^13.0.0"
   }
 }
