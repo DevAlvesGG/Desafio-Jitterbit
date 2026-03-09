@@ -1,12 +1,19 @@
 const { Client } = require('pg');
 
+//information dotenv
+const host = process.env.HOST
+const port = process.env.POSTGREPORT
+const database = process.env.DATABASE
+const user = process.env.USER
+const password = process.env.PASSWORD
+
 //configuration of the connection with the database
 const client = new Client({
-    host: 'localhost',
-    port: 5432,
-    database: 'orders_manager',
-    user: 'gustavo',
-    password: "123456"
+    host: host,
+    port: port,
+    database: database,
+    user: user,
+    password: password
 })
 client.connect();
 
@@ -158,7 +165,7 @@ route: /order/:id
                 SET value = $1
                 WHERE orderId = $2
                 RETURNING *`,
-                [orderToUpdate.value, orderToUpdate.orderid]
+                [orderToUpdate.value, orderToUpdate.orderId]
             );
 
             //verify if order exist
@@ -167,7 +174,7 @@ route: /order/:id
             //delete old itens
             await client.query(`
                 DELETE FROM Items WHERE orderId = $1`,
-                [orderToUpdate.orderid]
+                [orderToUpdate.orderId]
             );
 
             //insert new itens
@@ -176,7 +183,7 @@ route: /order/:id
                 await client.query(`
                    INSERT INTO Items (orderId, name, quantity, price)
                    VALUES ($1, $2, $3, $4)`,
-                    [orderToUpdate.orderid, item.name, item.quantity, item.price ]
+                    [orderToUpdate.orderId, item.name, item.quantity, item.price ]
                 );
             }
             await client.query('COMMIT');
